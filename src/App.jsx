@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Flex, Box, Text, Heading } from "rebass";
 import styled from "styled-components";
 import { FormComponent, FormContainer } from "react-authorize-net";
+import { AuthorizeNet } from "react-authorize-net";
 
 let clientKey = "SIMON";
 let apiLoginId = "645VpWBk6C";
@@ -47,6 +48,16 @@ class App extends Component {
     this.setState({ status: ["failure", []] });
   };
 
+  handlePaymentSuccess = (response) => {
+    console.log("Payment succeeded:", response);
+    // Process the payment on your server-side code
+  };
+
+  handlePaymentError = (error) => {
+    console.log("Payment failed:", error);
+    // Handle the payment error
+  };
+
   render() {
     return (
       <Box className="App" p={3}>
@@ -62,7 +73,6 @@ class App extends Component {
             onSuccess={this.onSuccessHandler}
             amount={23}
             component={FormComponent}
-            clientKey={clientKey}
             apiLoginId={apiLoginId}
           />
         ) : this.state.status[0] === "failure" ? (
@@ -71,6 +81,23 @@ class App extends Component {
             errors={this.state.status[1]}
           />
         ) : null}
+        <AuthorizeNet
+          clientKey="SIMON"
+          apiLoginId="645VpWBk6C"
+          amount={10.0}
+          currency="USD"
+          billingAddress={{
+            firstName: "John",
+            lastName: "Doe",
+            address: "123 Main St",
+            city: "Anytown",
+            state: "CA",
+            zip: "12345",
+            country: "US",
+          }}
+          onError={this.handlePaymentError}
+          onSuccess={this.handlePaymentSuccess}
+        />
       </Box>
     );
   }
