@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Flex, Box, Text, Heading } from "rebass";
 import styled from "styled-components";
 import { FormComponent, FormContainer } from "react-authorize-net";
-import { AuthorizeNet } from "react-authorize-net";
+import { Client, Check } from "authorizenet";
 
 let clientKey = "SIMON";
 let apiLoginId = "645VpWBk6C";
@@ -35,70 +35,124 @@ const Header = (props) => (
 );
 
 class App extends Component {
-  state = { status: "unpaid" };
+  constructor(props) {
+    super(props);
 
-  onErrorHandler = (response) => {
+    // Initialize Authorize.net client
+    this.client = new Client({
+      apiLoginId: "645VpWBk6C",
+      transactionKey: "3p27t37jSM8VV5q7",
+      environment: "sandbox", // or 'production'
+    });
+
+    // Set initial state
+    this.state = {
+      cardNumber: "",
+      expirationDate: "",
+      cvv: "",
+    };
+  }
+
+  handleInputChange = (event) => {
+    const target = event.target;
+    const value = target.type === "checkbox" ? target.checked : target.value;
+    const name = target.name;
+
     this.setState({
-      status: ["failure", response.messages.message.map((err) => err.text)],
+      [name]: value,
     });
   };
 
-  onSuccessHandler = (response) => {
-    // Process API response on your backend...
-    this.setState({ status: ["failure", []] });
-  };
+  handleSubmit = (event) => {
+    event.preventDefault();
 
-  handlePaymentSuccess = (response) => {
-    console.log("Payment succeeded:", response);
-    // Process the payment on your server-side code
-  };
+    const card = {
+      cardNumber: this.state.cardNumber,
+      expirationDate: this.state.expirationDate,
+      cvv: this.state.cvv,
+    };
 
-  handlePaymentError = (error) => {
-    console.log("Payment failed:", error);
-    // Handle the payment error
+    const check = new Check({
+      amount: 10.0,
+      firstName: "John",
+      lastName: "Doe",
+      accountType: "checking",
+      routingNumber: "125000024",
+      accountNumber: "12345678",
+    });
+
+    this.client.createTransaction(
+      {
+        amount: 10.0,
+        payment: { creditCard: card },
+        check: check,
+      },
+      (response) => {
+        console.log(response);
+        // Display success or error message to the user based on response
+      }
+    );
   };
+  // state = { status: "unpaid" };
+
+  // onErrorHandler = (response) => {
+  //   this.setState({
+  //     status: ["failure", response.messages.message.map((err) => err.text)],
+  //   });
+  // };
+
+  // onSuccessHandler = (response) => {
+  //   // Process API response on your backend...
+  //   this.setState({ status: ["failure", []] });
+  // };
 
   render() {
     return (
-      <Box className="App" p={3}>
-        <Header />
-        {this.state.status === "paid" ? (
-          <Text fontWeight={"500"} fontSize={3} mb={4}>
-            Thank you for your payment!
-          </Text>
-        ) : this.state.status === "unpaid" ? (
-          <FormContainer
-            environment="sandbox"
-            onError={this.onErrorHandler}
-            onSuccess={this.onSuccessHandler}
-            amount={23}
-            component={FormComponent}
-            apiLoginId={apiLoginId}
+      // <Box className="App" p={3}>
+      //   <Header />
+      //   {this.state.status === "paid" ? (
+      //     <Text fontWeight={"500"} fontSize={3} mb={4}>
+      //       Thank you for your payment!
+      //     </Text>
+      //   ) : this.state.status === "unpaid" ? (
+      //     <FormContainer
+      //       environment="sandbox"
+      //       onError={this.onErrorHandler}
+      //       onSuccess={this.onSuccessHandler}
+      //       amount={23}
+      //       component={FormComponent}
+      //       apiLoginId={apiLoginId}
+      //     />
+      //   ) : this.state.status[0] === "failure" ? (
+      //     <ErrorComponent
+      //       onBackButtonClick={() => this.setState({ status: "unpaid" })}
+      //       errors={this.state.status[1]}
+      //     />
+      //   ) : null}
+      // </Box>
+      <form id="payment-form" onSubmit={this.handleSubmit}>
+        <label>
+          Card Number
+          <input
+            type="text"
+            name="cardNumber"
+            onChange={this.handleInputChange}
           />
-        ) : this.state.status[0] === "failure" ? (
-          <ErrorComponent
-            onBackButtonClick={() => this.setState({ status: "unpaid" })}
-            errors={this.state.status[1]}
+        </label>
+        <label>
+          Expiration Date
+          <input
+            type="text"
+            name="expirationDate"
+            onChange={this.handleInputChange}
           />
-        ) : null}
-        <AuthorizeNet
-          clientKey="SIMON"
-          apiLoginId="645VpWBk6C"
-          amount={10.0}
-          currency="USD"
-          billingAddress={{
-            firstName: "John",
-            lastName: "Doe",
-            address: "123 Main St",
-            city: "Anytown",
-            state: "CA",
-            zip: "12345",
-            country: "US",
-          }}
-          onError={this.handlePaymentError}
-          onSuccess={this.handlePaymentSuccess}
-        />
-      </Box>
+        </label>
+        <label>
+          CVV
+          <input type="text" name="cvv" onChange={this.handleInputChange} />
+        </label>
+        <button type="submit">Pay</button>
+      </form>
     );
   }
 }

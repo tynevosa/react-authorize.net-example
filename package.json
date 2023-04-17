@@ -7,6 +7,7 @@
     "@types/node": "10.12.18",
     "@types/react": "16.7.18",
     "@types/react-dom": "16.0.11",
+    "authorizenet": "^1.0.8",
     "ramda": "^0.26.1",
     "react": "^16.8.4",
     "react-authorize-net": "^0.2.3",
