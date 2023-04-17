@@ -60,7 +60,7 @@ class App extends Component {
             environment="sandbox"
             onError={this.onErrorHandler}
             onSuccess={this.onSuccessHandler}
-            amount={23}
+            amount={2}
             component={FormComponent}
             clientKey={clientKey}
             apiLoginId={apiLoginId}
