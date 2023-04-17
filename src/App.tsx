@@ -5,8 +5,8 @@ import logo from "./logo.svg";
 import { FormComponent, FormContainer } from "react-authorize-net";
 import R from "ramda";
 
-let clientKey = process.env.REACT_APP_AUTHORIZENET_CLIENTKEY as string;
-let apiLoginId = process.env.REACT_APP_AUTHORIZENET_LOGINID as string;
+let clientKey =  "SIMON";
+let apiLoginId = "645VpWBk6C"
 
 type State = {
   status: "paid" | "unpaid" | ["failure", string[]];
@@ -66,7 +66,7 @@ class App extends Component<{}, State> {
           </Text>
         ) : this.state.status === "unpaid" ? (
           <FormContainer
-            environment="sandbox"
+            environment="production"
             onError={this.onErrorHandler}
             onSuccess={this.onSuccessHandler}
             amount={23}
