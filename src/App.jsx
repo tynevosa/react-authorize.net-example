@@ -57,10 +57,10 @@ class App extends Component {
           </Text>
         ) : this.state.status === "unpaid" ? (
           <FormContainer
-            environment="sandbox"
+            environment="production"
             onError={this.onErrorHandler}
             onSuccess={this.onSuccessHandler}
-            amount={2}
+            amount={23}
             component={FormComponent}
             clientKey={clientKey}
             apiLoginId={apiLoginId}
