@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { Flex, Box, Text, Heading } from "rebass";
 import styled from "styled-components";
 import { FormComponent, FormContainer } from "react-authorize-net";
-import PaymentForm from "./PaymentForm";
 
 let clientKey = "SIMON";
 let apiLoginId = "645VpWBk6C";
@@ -50,30 +49,29 @@ class App extends Component {
 
   render() {
     return (
-      <PaymentForm />
-      // <Box className="App" p={3}>
-      //   <Header />
-      //   {this.state.status === "paid" ? (
-      //     <Text fontWeight={"500"} fontSize={3} mb={4}>
-      //       Thank you for your payment!
-      //     </Text>
-      //   ) : this.state.status === "unpaid" ? (
-      //     <FormContainer
-      //       environment="production"
-      //       onError={this.onErrorHandler}
-      //       onSuccess={this.onSuccessHandler}
-      //       amount={23}
-      //       component={FormComponent}
-      //       clientKey={clientKey}
-      //       apiLoginId={apiLoginId}
-      //     />
-      //   ) : this.state.status[0] === "failure" ? (
-      //     <ErrorComponent
-      //       onBackButtonClick={() => this.setState({ status: "unpaid" })}
-      //       errors={this.state.status[1]}
-      //     />
-      //   ) : null}
-      // </Box>
+      <Box className="App" p={3}>
+        <Header />
+        {this.state.status === "paid" ? (
+          <Text fontWeight={"500"} fontSize={3} mb={4}>
+            Thank you for your payment!
+          </Text>
+        ) : this.state.status === "unpaid" ? (
+          <FormContainer
+            environment="production"
+            onError={this.onErrorHandler}
+            onSuccess={this.onSuccessHandler}
+            amount={23}
+            component={FormComponent}
+            clientKey={clientKey}
+            apiLoginId={apiLoginId}
+          />
+        ) : this.state.status[0] === "failure" ? (
+          <ErrorComponent
+            onBackButtonClick={() => this.setState({ status: "unpaid" })}
+            errors={this.state.status[1]}
+          />
+        ) : null}
+      </Box>
     );
   }
 }

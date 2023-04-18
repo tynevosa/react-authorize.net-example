@@ -11,6 +11,7 @@
     "authorizenet": "^1.0.8",
     "ramda": "^0.26.1",
     "react": "^16.8.4",
+    "react-acceptjs": "^0.3.0",
     "react-authorize-net": "^0.2.3",
     "react-dom": "^16.8.4",
     "react-scripts": "2.1.3",

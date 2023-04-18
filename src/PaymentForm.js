@@ -1,123 +1,65 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useAcceptJs } from "react-acceptjs";
+
+const authData = {
+  apiLoginID: "YOUR AUTHORIZE.NET API LOGIN ID",
+  clientKey: "YOUR AUTHORIZE.NET PUBLIC CLIENT KEY",
+};
 
 const PaymentForm = () => {
-  const [cardData, setCardData] = useState({
+  const { dispatchData, loading, error } = useAcceptJs({ authData });
+  const [cardData, setCardData] = React.useState({
     cardNumber: "",
-    month: "",
-    year: "",
-    cvv: "",
+    expMonth: "",
+    expYear: "",
+    cardCode: "",
   });
-
-  function handleInputChange(event) {
-    const { name, value } = event.target;
-    setCardData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  }
-
-  function handlePayment(event) {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const authData = {
-      clientKey: "SIMON",
-      apiLoginID: "645VpWBk6C",
-      data: {
-        type: "card",
-        card: cardData,
-      },
-    };
+    // Dispatch CC data to Authorize.net and receive payment nonce for use on your server
+    const response = await dispatchData({ cardData });
+    console.log("Received response:", response);
+  };
 
-    window.Accept.dispatchData(authData, function(response) {
-      if (response.messages.resultCode === "Error") {
-        // Handle error
-        console.error(response.messages.message);
-      } else {
-        const token = response.opaqueData.dataValue;
-        const paymentData = {
-          authData: {
-            apiKey: "YOUR_API_KEY",
-            apiLoginID: "YOUR_API_LOGIN_ID",
-          },
-          transactionData: {
-            amount: "10.00",
-            currency: "USD",
-            payment: {
-              opaqueData: {
-                dataDescriptor: "COMMON.ACCEPT.INAPP.PAYMENT",
-                dataValue: token,
-              },
-            },
-          },
-        };
-
-        fetch("https://api.authorize.net/payment/transactions", {
-          method: "POST",
-          body: JSON.stringify(paymentData),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.transactionResponse.responseCode === "1") {
-              // Payment successful
-              console.log("Payment successful!");
-            } else {
-              // Payment failed
-              console.error(data.transactionResponse.errors.error[0].errorText);
-            }
-          })
-          .catch((error) => {
-            // Handle error
-            console.error(error);
-          });
-      }
-    });
-  }
   return (
     <>
-      <form onSubmit={handlePayment}>
-        <div>
-          <label htmlFor="cardNumber">Card Number:</label>
-          <input
-            type="text"
-            id="cardNumber"
-            name="cardNumber"
-            value={cardData.cardNumber}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div>
-          <label htmlFor="month">Expiration Month:</label>
-          <input
-            type="text"
-            id="month"
-            name="month"
-            value={cardData.month}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div>
-          <label htmlFor="year">Expiration Year:</label>
-          <input
-            type="text"
-            id="year"
-            name="year"
-            value={cardData.year}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div>
-          <label htmlFor="cvv">CVV:</label>
-          <input
-            type="text"
-            id="cvv"
-            name="cvv"
-            value={cardData.cvv}
-            onChange={handleInputChange}
-          />
-        </div>
-        <button type="submit">Submit Payment</button>
+      {" "}
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          name="cardNumber"
+          value={cardData.cardNumber}
+          onChange={(event) =>
+            setCardData({ ...cardData, cardNumber: event.target.value })
+          }
+        />
+        <input
+          type="text"
+          name="expMonth"
+          value={cardData.expMonth}
+          onChange={(event) =>
+            setCardData({ ...cardData, expMonth: event.target.value })
+          }
+        />
+        <input
+          type="text"
+          name="expYear"
+          value={cardData.expYear}
+          onChange={(event) =>
+            setCardData({ ...cardData, expYear: event.target.value })
+          }
+        />
+        <input
+          type="text"
+          name="cardCode"
+          value={cardData.cardCode}
+          onChange={(event) =>
+            setCardData({ ...cardData, cardCode: event.target.value })
+          }
+        />
+        <button type="submit" disabled={loading || error}>
+          Pay
+        </button>
       </form>
     </>
   );
